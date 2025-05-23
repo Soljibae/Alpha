@@ -1,3 +1,5 @@
+#include "AEEngine.h"
+
 class GameState
 {
 public:
@@ -8,6 +10,15 @@ public:
 	void Exit_Game();
 
 	bool GetisGameRunning();
+	bool GetisGameStarted();
+	
+	void StartGame();
+	
+	void PrintTime();
 private:
 	bool isGameRunning;
+	bool isGameStarted;
+	f64 start_time;
+	f64 curr_time;
+	s8 font;
 };
