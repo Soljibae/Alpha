@@ -5,16 +5,31 @@
 #include <iomanip>
 
 GameState::GameState()
+	:transforms{ 0 }
 {
 	isGameRunning = true;
 	isGameStarted = false;
 	start_time = 0;
 	curr_time = 0;
 	font = AEGfxCreateFont("Assets/liberation-mono.ttf", 72);
+	pMesh = 0;
 }
 
 void GameState::Init_Game()
-{
+{AEGfxMeshStart();
+
+	AEGfxTriAdd(
+		-0.5f, -0.5f, 0xFFFFFFFF, 0.0f, 0.0f,
+		0.5f, -0.5f, 0xFFFFFFFF, 0.0f, 0.0f,
+		-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
+
+	AEGfxTriAdd(
+		0.5f, -0.5f, 0xFFFFFFFF, 0.0f, 0.0f,
+		0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f,
+		-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
+
+	pMesh = AEGfxMeshEnd();
+	
 
 }
 
@@ -44,12 +59,14 @@ void GameState::Update_Game()
 		
 	}
 
+	AEGfxSetBackgroundColor(0.0f, 0.0f, 0.0f);
+	PrintSquare();
 	PrintTime();
 }
 
 void GameState::Exit_Game()
 {
-
+	AEGfxMeshFree(pMesh);
 }
 
 bool GameState::GetisGameRunning()
@@ -89,5 +106,31 @@ void GameState::PrintTime()
 	}
 
 	AEGfxGetPrintSize(font, time.c_str(), 0.5, &text_width, &text_height);
-	AEGfxPrint(font, time.c_str(), - text_width / 2, 0.8, 0.5, 0, 0, 0, 1);
+	AEGfxPrint(font, time.c_str(), - text_width / 2, 0.8f, 0.5f, 1.f, 1.f, 1.f, 1);
+}
+
+void GameState::PrintSquare()
+{
+	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
+
+	DrawRect(-700, 0, 50, 300, 1.f, 0.f, 1.f, 1.f);
+}
+
+void GameState::DrawRect(float x, float y, float w, float h, float r, float g, float b, float a)
+{
+	AEMtx33 scale;
+	AEMtx33Scale(&scale, w, h);
+
+	AEMtx33 tran;
+	AEMtx33Trans(&tran, x, y);
+
+	AEMtx33Concat(&transforms, &tran, &scale);
+
+	AEGfxSetColorToMultiply(0.f, 0.f, 0.f, 0.f);
+
+	AEGfxSetColorToAdd(r, g, b, a);
+
+	AEGfxSetTransform(transforms.m);
+
+	AEGfxMeshDraw(pMesh, AE_GFX_MDM_TRIANGLES);
 }
