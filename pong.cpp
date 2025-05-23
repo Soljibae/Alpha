@@ -4,6 +4,9 @@
 #include <sstream>
 #include <iomanip>
 
+Rect p1{ -600, 0, 70, 250, 1.f, 0.f, 1.f, 1.f };
+Rect p2{ 600, 0, 70, 250, 0.f, 1.f, 1.f, 1.f };
+
 GameState::GameState()
 	:transforms{ 0 }
 {
@@ -16,7 +19,8 @@ GameState::GameState()
 }
 
 void GameState::Init_Game()
-{AEGfxMeshStart();
+{
+	AEGfxMeshStart();
 
 	AEGfxTriAdd(
 		-0.5f, -0.5f, 0xFFFFFFFF, 0.0f, 0.0f,
@@ -30,7 +34,7 @@ void GameState::Init_Game()
 
 	pMesh = AEGfxMeshEnd();
 	
-
+	
 }
 
 void GameState::Update_Game()
@@ -113,7 +117,13 @@ void GameState::PrintSquare()
 {
 	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
 
-	DrawRect(-700, 0, 50, 300, 1.f, 0.f, 1.f, 1.f);
+	DrawRect(p1);
+	
+	DrawRect(-800, 0, 40, 900, 1.f, 0.f, 1.f, 1.f);
+
+	DrawRect(p2);
+
+	DrawRect(800, 0, 40, 900, 0.f, 1.f, 1.f, 1.f);
 }
 
 void GameState::DrawRect(float x, float y, float w, float h, float r, float g, float b, float a)
@@ -133,4 +143,34 @@ void GameState::DrawRect(float x, float y, float w, float h, float r, float g, f
 	AEGfxSetTransform(transforms.m);
 
 	AEGfxMeshDraw(pMesh, AE_GFX_MDM_TRIANGLES);
+}
+
+void  GameState::DrawRect(Rect& rect)
+{
+	AEMtx33 scale;
+	AEMtx33Scale(&scale, rect._width, rect._height);
+	AEMtx33 tran;
+	AEMtx33Trans(&tran, rect._x, rect._y);
+
+	AEMtx33Concat(&transforms, &tran, &scale);
+
+	AEGfxSetColorToMultiply(0.f, 0.f, 0.f, 0.f);
+
+	AEGfxSetColorToAdd(rect._r, rect._g, rect._b, rect._a);
+
+	AEGfxSetTransform(transforms.m);
+
+	AEGfxMeshDraw(pMesh, AE_GFX_MDM_TRIANGLES);
+}
+
+Rect::Rect(float x, float y, float width, float height, float r, float g, float b, float a)
+{
+	_x = x;
+	_y = y;
+	_width = width;
+	_height = height;
+	_r = r;
+	_g = g;
+	_b = b;
+	_a = a;
 }
