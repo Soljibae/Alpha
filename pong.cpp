@@ -3,20 +3,20 @@
 #include <string>
 #include <sstream>
 #include <iomanip>
-
-Shape p1{ -600, 0, 70, 250, 1.f, 0.f, 1.f, 1.f };
-Shape p2{ 600, 0, 70, 250, 0.f, 1.f, 1.f, 1.f };
-Shape circle{ 0, 0, 50, 50, 1.f, 1.f, 1.f, 1.f };
+#include <random>
 
 GameState::GameState()
-	:transform{ 0 }
+	: transform{ 0 }
+	, current_Game_State(PRE_START)
+	, start_time(0)
+	, curr_time(0)
+	, font(AEGfxCreateFont("Assets/liberation-mono.ttf", 72))
+	, pMesh(0)
+	, pTex(AEGfxTextureLoad("Assets/circle.png"))
+	, p1{ -600, 0, 70, 250, 1.f, 0.f, 1.f, 1.f }
+	, p2{ 600, 0, 70, 250, 0.f, 1.f, 1.f, 1.f }
+	, circle{ 0, 0, 50, 50 }
 {
-	currentGameState = PRE_START;
-	start_time = 0;
-	curr_time = 0;
-	font = AEGfxCreateFont("Assets/liberation-mono.ttf", 72);
-	pMesh = 0;
-	pTex = AEGfxTextureLoad("Assets/circle.png");
 }
 
 void GameState::Init_Game()
@@ -35,39 +35,41 @@ void GameState::Init_Game()
 
 	pMesh = AEGfxMeshEnd();
 
-
+	Init_Circle(circle);
 }
 
 void GameState::Update_Game()
 {
+	f64 dt = AEFrameRateControllerGetFrameTime();
+
 	if (AEInputCheckTriggered(VK_SPACE))
 	{
-		if (currentGameState == PRE_START)
+		if (current_Game_State == PRE_START)
 		{
-			StartGame();
+			Start_Game();
 			start_time = AEGetTime(nullptr);
 		}
 	}
 
 	if (AEInputCheckTriggered(AEVK_ESCAPE))
-		currentGameState = GAME_OVER;
+		current_Game_State = GAME_OVER;
 
 
-	if (currentGameState == PLAYING)
+	if (current_Game_State == PLAYING)
 	{
-
 		if (AEInputCheckTriggered(AEVK_R))
 		{
 			Init_Game();
 			start_time = AEGetTime(nullptr);
 		}
 
+		Update_Circle(circle, dt * 400);
 	}
 
 	AEGfxSetBackgroundColor(0.0f, 0.0f, 0.0f);
-	PrintSquare();
-	PrintCircle();
-	PrintTime();
+	Print_Square();
+	Print_Circle();
+	Print_Time();
 }
 
 void GameState::Exit_Game()
@@ -76,17 +78,17 @@ void GameState::Exit_Game()
 	AEGfxTextureUnload(pTex);
 }
 
-void GameState::StartGame()
+void GameState::Start_Game()
 {
-	currentGameState = PLAYING;
+	current_Game_State = PLAYING;
 }
 
-eGameState GameState::GetcurrentGameState()
+GameState::eGameState GameState::Get_Current_Game_State()
 {
-	return currentGameState;
+	return current_Game_State;
 }
 
-void GameState::PrintTime()
+void GameState::Print_Time()
 {
 	static int curr_min = 0;
 	static int curr_sec = 0;
@@ -100,7 +102,7 @@ void GameState::PrintTime()
 
 	std::string time = oss.str();
 
-	if (currentGameState == PLAYING)
+	if (current_Game_State == PLAYING)
 	{
 		curr_time = AEGetTime(nullptr) - start_time;
 		curr_min = static_cast<int>(curr_time / 60);
@@ -111,20 +113,20 @@ void GameState::PrintTime()
 	AEGfxPrint(font, time.c_str(), -text_width / 2, 0.8f, 0.5f, 1.f, 1.f, 1.f, 1);
 }
 
-void GameState::PrintSquare()
+void GameState::Print_Square()
 {
 	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
 
-	DrawShape(p1);
+	Draw_Shape(p1);
 
-	DrawShape(-800, 0, 40, 900, 1.f, 0.f, 1.f, 1.f);
+	Draw_Shape(-800, 0, 40, 900, 1.f, 0.f, 1.f, 1.f);
 
-	DrawShape(p2);
+	Draw_Shape(p2);
 
-	DrawShape(800, 0, 40, 900, 0.f, 1.f, 1.f, 1.f);
+	Draw_Shape(800, 0, 40, 900, 0.f, 1.f, 1.f, 1.f);
 }
 
-void GameState::PrintCircle()
+void GameState::Print_Circle()
 {
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 
@@ -134,17 +136,17 @@ void GameState::PrintCircle()
 
 	AEGfxTextureSet(pTex, 0, 0);
 
-	DrawShape(circle);
+	Draw_Shape(circle);
 }
 
-void GameState::DrawShape(float x, float y, float w, float h, float r, float g, float b, float a)
+void GameState::Draw_Shape(float x, float y, float w, float h, float r, float g, float b, float a)
 {
-	Shape shape(x, y, w, h, r, g, b, a);
+	Rect shape(x, y, w, h, r, g, b, a);
 
-	DrawShape(shape);
+	Draw_Shape(shape);
 }
 
-void  GameState::DrawShape(Shape& shape)
+void  GameState::Draw_Shape(Shape& shape)
 {
 	AEMtx33 scale;
 	AEMtx33Scale(&scale, shape._width, shape._height);
@@ -162,4 +164,29 @@ void  GameState::DrawShape(Shape& shape)
 	AEGfxMeshDraw(pMesh, AE_GFX_MDM_TRIANGLES);
 }
 
-Shape::Shape(float x, float y, float width, float height, float r, float g, float b, float a) :_x(x), _y(y), _width(width), _height(height), _r(r), _g(g), _b(b), _a(a) {}
+GameState::Shape::Shape(float x, float y, float width, float height, float r, float g, float b, float a) :_x(x), _y(y), _width(width), _height(height), _r(r), _g(g), _b(b), _a(a) {}
+
+GameState::Rect::Rect(float x, float y, float width, float height, float r, float g, float b, float a) : Shape(x, y, width, height, r, g, b, a), score(0) {}
+
+GameState::Circle::Circle(float x, float y, float width, float height, float r, float g, float b, float a) : Shape(x, y, width, height, r, g, b, a)
+{
+	AEVec2Zero(&moving_vector);
+}
+
+void GameState::Init_Circle(Circle& circle)
+{
+	static std::mt19937 gen{ std::random_device{}() };
+	std::uniform_real_distribution<float> dist(-1, 1);
+
+	circle._x = 0;
+	circle._y = 0;
+
+	AEVec2Set(&circle.moving_vector, dist(gen), dist(gen));
+	AEVec2Normalize(&circle.moving_vector, &circle.moving_vector);
+}
+
+void GameState::Update_Circle(Circle& circle, f64 dt)
+{
+	circle._x += circle.moving_vector.x * dt;
+	circle._y += circle.moving_vector.y * dt;
+}

@@ -21,7 +21,7 @@ int APIENTRY wWinMain(
 
     gameState.Init_Game();
 
-    while (gameState.GetcurrentGameState() != GAME_OVER)
+    while (gameState.Get_Current_Game_State() != GameState::GAME_OVER)
     {
         AESysFrameStart();
 
