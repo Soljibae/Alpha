@@ -4,18 +4,19 @@
 #include <sstream>
 #include <iomanip>
 
-Rect p1{ -600, 0, 70, 250, 1.f, 0.f, 1.f, 1.f };
-Rect p2{ 600, 0, 70, 250, 0.f, 1.f, 1.f, 1.f };
+Shape p1{ -600, 0, 70, 250, 1.f, 0.f, 1.f, 1.f };
+Shape p2{ 600, 0, 70, 250, 0.f, 1.f, 1.f, 1.f };
+Shape circle{ 0, 0, 50, 50, 1.f, 1.f, 1.f, 1.f };
 
 GameState::GameState()
-	:transforms{ 0 }
+	:transform{ 0 }
 {
-	isGameRunning = true;
-	isGameStarted = false;
+	currentGameState = PRE_START;
 	start_time = 0;
 	curr_time = 0;
 	font = AEGfxCreateFont("Assets/liberation-mono.ttf", 72);
 	pMesh = 0;
+	pTex = AEGfxTextureLoad("Assets/circle.png");
 }
 
 void GameState::Init_Game()
@@ -23,69 +24,66 @@ void GameState::Init_Game()
 	AEGfxMeshStart();
 
 	AEGfxTriAdd(
-		-0.5f, -0.5f, 0xFFFFFFFF, 0.0f, 0.0f,
-		0.5f, -0.5f, 0xFFFFFFFF, 0.0f, 0.0f,
+		-0.5f, -0.5f, 0xFFFFFFFF, 0.0f, 1.0f,
+		0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f,
 		-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
 
 	AEGfxTriAdd(
-		0.5f, -0.5f, 0xFFFFFFFF, 0.0f, 0.0f,
-		0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f,
+		0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f,
+		0.5f, 0.5f, 0xFFFFFFFF, 1.0f, 0.0f,
 		-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
 
 	pMesh = AEGfxMeshEnd();
-	
-	
+
+
 }
 
 void GameState::Update_Game()
 {
-	if (AEInputCheckTriggered(VK_SPACE) || 0 == AESysDoesWindowExist())
+	if (AEInputCheckTriggered(VK_SPACE))
 	{
-		if (isGameStarted == false)
+		if (currentGameState == PRE_START)
 		{
 			StartGame();
 			start_time = AEGetTime(nullptr);
 		}
 	}
 
-	if (AEInputCheckTriggered(AEVK_ESCAPE) || 0 == AESysDoesWindowExist())
-		isGameRunning = false;
-	
+	if (AEInputCheckTriggered(AEVK_ESCAPE))
+		currentGameState = GAME_OVER;
 
-	if (isGameStarted)
+
+	if (currentGameState == PLAYING)
 	{
 
-		if (AEInputCheckTriggered(AEVK_R) || 0 == AESysDoesWindowExist())
+		if (AEInputCheckTriggered(AEVK_R))
 		{
 			Init_Game();
 			start_time = AEGetTime(nullptr);
 		}
-		
+
 	}
 
 	AEGfxSetBackgroundColor(0.0f, 0.0f, 0.0f);
 	PrintSquare();
+	PrintCircle();
 	PrintTime();
 }
 
 void GameState::Exit_Game()
 {
 	AEGfxMeshFree(pMesh);
-}
-
-bool GameState::GetisGameRunning()
-{
-	return isGameRunning;
-}
-
-bool GameState::GetisGameStarted()
-{
-	return isGameStarted;
+	AEGfxTextureUnload(pTex);
 }
 
 void GameState::StartGame()
 {
-	isGameStarted = true;
+	currentGameState = PLAYING;
+}
+
+eGameState GameState::GetcurrentGameState()
+{
+	return currentGameState;
 }
 
 void GameState::PrintTime()
@@ -102,7 +100,7 @@ void GameState::PrintTime()
 
 	std::string time = oss.str();
 
-	if (isGameStarted)
+	if (currentGameState == PLAYING)
 	{
 		curr_time = AEGetTime(nullptr) - start_time;
 		curr_min = static_cast<int>(curr_time / 60);
@@ -110,67 +108,58 @@ void GameState::PrintTime()
 	}
 
 	AEGfxGetPrintSize(font, time.c_str(), 0.5, &text_width, &text_height);
-	AEGfxPrint(font, time.c_str(), - text_width / 2, 0.8f, 0.5f, 1.f, 1.f, 1.f, 1);
+	AEGfxPrint(font, time.c_str(), -text_width / 2, 0.8f, 0.5f, 1.f, 1.f, 1.f, 1);
 }
 
 void GameState::PrintSquare()
 {
 	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
 
-	DrawRect(p1);
-	
-	DrawRect(-800, 0, 40, 900, 1.f, 0.f, 1.f, 1.f);
+	DrawShape(p1);
 
-	DrawRect(p2);
+	DrawShape(-800, 0, 40, 900, 1.f, 0.f, 1.f, 1.f);
 
-	DrawRect(800, 0, 40, 900, 0.f, 1.f, 1.f, 1.f);
+	DrawShape(p2);
+
+	DrawShape(800, 0, 40, 900, 0.f, 1.f, 1.f, 1.f);
 }
 
-void GameState::DrawRect(float x, float y, float w, float h, float r, float g, float b, float a)
+void GameState::PrintCircle()
+{
+	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
+
+	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
+
+	AEGfxSetTransparency(1.0f);
+
+	AEGfxTextureSet(pTex, 0, 0);
+
+	DrawShape(circle);
+}
+
+void GameState::DrawShape(float x, float y, float w, float h, float r, float g, float b, float a)
+{
+	Shape shape(x, y, w, h, r, g, b, a);
+
+	DrawShape(shape);
+}
+
+void  GameState::DrawShape(Shape& shape)
 {
 	AEMtx33 scale;
-	AEMtx33Scale(&scale, w, h);
-
+	AEMtx33Scale(&scale, shape._width, shape._height);
 	AEMtx33 tran;
-	AEMtx33Trans(&tran, x, y);
+	AEMtx33Trans(&tran, shape._x, shape._y);
 
-	AEMtx33Concat(&transforms, &tran, &scale);
+	AEMtx33Concat(&transform, &tran, &scale);
 
 	AEGfxSetColorToMultiply(0.f, 0.f, 0.f, 0.f);
 
-	AEGfxSetColorToAdd(r, g, b, a);
+	AEGfxSetColorToAdd(shape._r, shape._g, shape._b, shape._a);
 
-	AEGfxSetTransform(transforms.m);
+	AEGfxSetTransform(transform.m);
 
 	AEGfxMeshDraw(pMesh, AE_GFX_MDM_TRIANGLES);
 }
 
-void  GameState::DrawRect(Rect& rect)
-{
-	AEMtx33 scale;
-	AEMtx33Scale(&scale, rect._width, rect._height);
-	AEMtx33 tran;
-	AEMtx33Trans(&tran, rect._x, rect._y);
-
-	AEMtx33Concat(&transforms, &tran, &scale);
-
-	AEGfxSetColorToMultiply(0.f, 0.f, 0.f, 0.f);
-
-	AEGfxSetColorToAdd(rect._r, rect._g, rect._b, rect._a);
-
-	AEGfxSetTransform(transforms.m);
-
-	AEGfxMeshDraw(pMesh, AE_GFX_MDM_TRIANGLES);
-}
-
-Rect::Rect(float x, float y, float width, float height, float r, float g, float b, float a)
-{
-	_x = x;
-	_y = y;
-	_width = width;
-	_height = height;
-	_r = r;
-	_g = g;
-	_b = b;
-	_a = a;
-}
+Shape::Shape(float x, float y, float width, float height, float r, float g, float b, float a) :_x(x), _y(y), _width(width), _height(height), _r(r), _g(g), _b(b), _a(a) {}
