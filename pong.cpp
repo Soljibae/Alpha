@@ -5,6 +5,7 @@
 #include <iomanip>
 #include <random>
 #include <algorithm>
+#include <cmath>
 
 GameState::GameState()
 	: transform{ 0 }
@@ -45,6 +46,12 @@ void GameState::Init_Game()
 
 	pMesh = AEGfxMeshEnd();
 
+	p1._y = 0;
+	p2._y = 0;
+
+	p1.score = 0;
+	p2.score = 0;
+
 	Init_Circle(circle);
 }
 
@@ -81,14 +88,31 @@ void GameState::Update_Game()
 
 		Collision_Check_Player(p2, circle);
 
-		Update_Circle(circle, dt * 600);
+		if (CheckPlayerWin(p1, p2))
+		{
+			current_Game_State = VICTORY;
+		}
 
+		Update_Rect(p1, p2, dt);
+		Update_Circle(circle, dt);
+
+	}
+
+	if (current_Game_State == VICTORY)
+	{
+		if (AEInputCheckTriggered(AEVK_R))
+		{
+			Init_Game();
+			Start_Game();
+		}
+		Print_Winner();
 	}
 
 	AEGfxSetBackgroundColor(0.0f, 0.0f, 0.0f);
 	Print_Square();
 	Print_Circle();
 	Print_Time();
+	Print_Score();
 }
 
 void GameState::Exit_Game()
@@ -154,10 +178,49 @@ void GameState::Collision_Check_PlayerGoal(Rect& rect, Circle& circle, float wal
 	}
 }
 
+bool  GameState::CheckPlayerWin(Rect& rect1, Rect& rect2)
+{
+	if (rect1.score == 11 || rect2.score == 11)
+		return true;
+
+	return false;
+}
+
 void GameState::Update_Circle(Circle& circle, f64 dt)
 {
-	circle._x += circle.moving_vector.x * dt;
-	circle._y += circle.moving_vector.y * dt;
+	circle._x += circle.moving_vector.x * (dt * 600);
+	circle._y += circle.moving_vector.y * (dt * 600);
+}
+
+void GameState::Update_Rect(Rect& rect1, Rect& rect2, f64 dt)
+{
+	if (AEInputCheckCurr(AEVK_W))
+	{
+		rect1._y = std::clamp(rect1._y + static_cast<float>(dt) * 600, -AEGfxGetWindowHeight() / 2 + rect1._height / 2, AEGfxGetWindowHeight() / 2 - rect1._height / 2);
+	}
+	if (AEInputCheckCurr(AEVK_S))
+	{
+		rect1._y = std::clamp(rect1._y - static_cast<float>(dt) * 600, -AEGfxGetWindowHeight() / 2 + rect1._height / 2, AEGfxGetWindowHeight() / 2 - rect1._height / 2);
+	}
+
+	s32 mouse_x = 0;
+	s32 mouse_y = 0;
+
+	AEInputGetCursorPosition(&mouse_x, &mouse_y);
+
+	mouse_y = AEGfxGetWindowHeight() / 2.0f - static_cast<float>(mouse_y);
+
+	if (std::fabs(rect2._y - mouse_y) >= 30.f)
+	{
+		if (rect2._y < mouse_y)
+		{
+			rect2._y = std::clamp(rect2._y + static_cast<float>(dt) * 600, -AEGfxGetWindowHeight() / 2 + rect2._height / 2, AEGfxGetWindowHeight() / 2 - rect2._height / 2);
+		}
+		else
+		{
+			rect2._y = std::clamp(rect2._y - static_cast<float>(dt) * 600, -AEGfxGetWindowHeight() / 2 + rect2._height / 2, AEGfxGetWindowHeight() / 2 - rect2._height / 2);
+		}
+	}
 }
 
 void GameState::Print_Time()
@@ -166,7 +229,6 @@ void GameState::Print_Time()
 	static int curr_sec = 0;
 
 	f32 text_width = 0;
-	f32 text_height = 0;
 
 	std::ostringstream oss;
 
@@ -181,7 +243,7 @@ void GameState::Print_Time()
 		curr_sec = static_cast<int>(curr_time) % 60;
 	}
 
-	AEGfxGetPrintSize(font, time.c_str(), 0.5f, &text_width, &text_height);
+	AEGfxGetPrintSize(font, time.c_str(), 0.5f, &text_width, 0);
 	AEGfxPrint(font, time.c_str(), -text_width / 2, 0.8f, 0.5f, 1.f, 1.f, 1.f, 1);
 }
 
@@ -209,6 +271,43 @@ void GameState::Print_Circle()
 	AEGfxTextureSet(pTex, 0, 0);
 
 	Draw_Shape(circle);
+}
+
+void GameState::Print_Score()
+{
+	std::ostringstream oss;
+
+	f32 text_width = 0;
+
+	oss << std::setw(2) << std::setfill('0') << p1.score;
+
+	AEGfxGetPrintSize(font, oss.str().c_str(), 0.5f, &text_width, 0);
+	AEGfxPrint(font, oss.str().c_str(), -0.25f -text_width / 2, 0.75f, 0.6f, 1.f, 1.f, 1.f, 1);
+
+	oss.str("");
+	oss.clear();
+
+	oss << std::setw(2) << std::setfill('0') << p2.score;
+
+	AEGfxGetPrintSize(font, oss.str().c_str(), 0.5f, &text_width, 0);
+	AEGfxPrint(font, oss.str().c_str(), 0.25 - text_width / 2, 0.75f, 0.6f, 1.f, 1.f, 1.f, 1);
+}
+
+void GameState::Print_Winner()
+{
+	f32 text_width = 0;
+
+	if (p1.score == 11)
+	{
+		AEGfxGetPrintSize(font, "WIN", 0.5f, &text_width, 0);
+		AEGfxPrint(font, "WIN", -0.25f - text_width / 2, 0.6f, 0.6f, 1.f, 1.f, 1.f, 1);
+	}
+
+	if (p2.score == 11)
+	{
+		AEGfxGetPrintSize(font, "WIN", 0.5f, &text_width, 0);
+		AEGfxPrint(font, "WIN", 0.25 - text_width / 2, 0.6f, 0.6f, 1.f, 1.f, 1.f, 1);
+	}
 }
 
 void GameState::Draw_Shape(float x, float y, float w, float h, float r, float g, float b, float a)

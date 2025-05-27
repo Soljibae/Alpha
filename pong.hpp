@@ -12,6 +12,7 @@ public:
 	{
 		PRE_START,
 		PLAYING,
+		VICTORY,
 		GAME_OVER
 	} eGameState;
 
@@ -50,11 +51,15 @@ public:
 	void Collision_Check_Player(Rect& rect, Circle& circle);
 	void Collision_Check_Line(Circle& circle);
 	void Collision_Check_PlayerGoal(Rect& rect, Circle& circle, float wall_x);
+	bool CheckPlayerWin(Rect& rect1, Rect& rect2);
 	void Update_Circle(Circle& circle, f64 dt);
+	void Update_Rect(Rect& rect1, Rect& rect2, f64 dt);
 
 	void Print_Time();
 	void Print_Square();
 	void Print_Circle();
+	void Print_Score();
+	void Print_Winner();
 	void Draw_Shape(float x, float y, float w, float h, float r, float g, float b, float a);
 	void Draw_Shape(Shape& shape);
 
