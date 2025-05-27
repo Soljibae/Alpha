@@ -47,6 +47,9 @@ public:
 
 	void Init_Circle(Circle& circle);
 
+	void Collision_Check_Player(Rect& rect, Circle& circle);
+	void Collision_Check_Line(Circle& circle);
+	void Collision_Check_PlayerGoal(Rect& rect, Circle& circle, float wall_x);
 	void Update_Circle(Circle& circle, f64 dt);
 
 	void Print_Time();
