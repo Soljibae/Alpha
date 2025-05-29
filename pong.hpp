@@ -35,6 +35,7 @@ public:
 	struct Circle : public Shape
 	{
 		AEVec2 moving_vector;
+		float speed;
 
 		Circle(float x, float y, float width, float height, float r = 1.f, float g = 1.f, float b = 1.f, float a = 1.f);
 	};

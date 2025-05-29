@@ -25,7 +25,7 @@ GameState::Shape::Shape(float x, float y, float width, float height, float r, fl
 
 GameState::Rect::Rect(float x, float y, float width, float height, float r, float g, float b, float a) : Shape(x, y, width, height, r, g, b, a), score(0) {}
 
-GameState::Circle::Circle(float x, float y, float width, float height, float r, float g, float b, float a) : Shape(x, y, width, height, r, g, b, a)
+GameState::Circle::Circle(float x, float y, float width, float height, float r, float g, float b, float a) : Shape(x, y, width, height, r, g, b, a), speed(600)
 {
 	AEVec2Zero(&moving_vector);
 }
@@ -78,24 +78,24 @@ void GameState::Update_Game()
 			Start_Game();
 		}
 
-		Collision_Check_Line(circle);
+		Update_Rect(p1, p2, dt);
 
-		Collision_Check_PlayerGoal(p1, circle, AEGfxGetWindowWidth() / 2 - 20);
-
-		Collision_Check_PlayerGoal(p2, circle, -AEGfxGetWindowWidth() / 2 + 20);
+		Update_Circle(circle, dt);
 
 		Collision_Check_Player(p1, circle);
 
 		Collision_Check_Player(p2, circle);
 
+		Collision_Check_PlayerGoal(p1, circle, AEGfxGetWindowWidth() / 2 - 20);
+
+		Collision_Check_PlayerGoal(p2, circle, -AEGfxGetWindowWidth() / 2 + 20);
+
+		Collision_Check_Line(circle);
+
 		if (CheckPlayerWin(p1, p2))
 		{
 			current_Game_State = VICTORY;
 		}
-
-		Update_Rect(p1, p2, dt);
-		Update_Circle(circle, dt);
-
 	}
 
 	if (current_Game_State == VICTORY)
@@ -139,6 +139,7 @@ void GameState::Init_Circle(Circle& circle)
 
 	circle._x = 0;
 	circle._y = 0;
+	circle.speed = 600;
 
 	AEVec2Set(&circle.moving_vector, dist(gen), dist(gen));
 	AEVec2Normalize(&circle.moving_vector, &circle.moving_vector);
@@ -146,27 +147,47 @@ void GameState::Init_Circle(Circle& circle)
 
 void GameState::Collision_Check_Player(Rect& rect, Circle& circle)
 {
-	AEVec2 closest_point, circle_vector;
-	AEVec2Set(&circle_vector, circle._x, circle._y);
-	AEVec2Set(&closest_point, std::clamp(circle._x, rect._x - rect._width / 2, rect._x + rect._width / 2), std::clamp(circle._y, rect._y - rect._height / 2, rect._y + rect._height / 2));
+	const float radius = circle._width * 0.5f;
+	const float halfW = rect._width * 0.5f;
+	const float halfH = rect._height * 0.5f;
 
-	if (AEVec2Distance(&circle_vector, &closest_point) <= circle._width / 2)
+	float dx = circle._x - rect._x;
+	float dy = circle._y - rect._y;
+
+	if (std::fabs(dx) < halfW + radius &&
+		std::fabs(dy) < halfH + radius)
 	{
-		if (closest_point.x == rect._x - rect._width / 2 || closest_point.x == rect._x + rect._width / 2)
-		{
-			circle.moving_vector.x *= -1;
-		}
-		if (closest_point.y == rect._y - rect._height / 2 || closest_point.y == rect._y + rect._height / 2)
-		{
-			circle.moving_vector.y *= -1;
-		}
+
+		AEVec2 changed_vector;
+		AEVec2 circel_vector;
+		AEVec2 rect_vector;
+		AEVec2Set(&circel_vector, circle._x, circle._y);
+		AEVec2Set(&rect_vector, rect._x, rect._y);
+		AEVec2Sub(&changed_vector, &circel_vector, &rect_vector);
+		AEVec2Normalize(&changed_vector, &changed_vector);
+		
+		circle.moving_vector = changed_vector;
+
+		circle.speed = 1600;            
 	}
 }
 
 void GameState::Collision_Check_Line(Circle& circle)
 {
-	if (AEGfxGetWindowHeight() / 2 - circle._y < circle._height / 2 || AEGfxGetWindowHeight() / 2 + circle._y < circle._height / 2)
+	float halfH = AEGfxGetWindowHeight() / 2.0f;
+	float radius = circle._height / 2.0f;
+
+	if (circle._y + radius > halfH)
+	{
+		circle._y = halfH - radius;
 		circle.moving_vector.y *= -1;
+	}
+
+	else if (circle._y - radius < -halfH)
+	{
+		circle._y = -halfH + radius;
+		circle.moving_vector.y *= -1;
+	}
 }
 
 void GameState::Collision_Check_PlayerGoal(Rect& rect, Circle& circle, float wall_x)
@@ -188,19 +209,21 @@ bool  GameState::CheckPlayerWin(Rect& rect1, Rect& rect2)
 
 void GameState::Update_Circle(Circle& circle, f64 dt)
 {
-	circle._x += circle.moving_vector.x * (dt * 600);
-	circle._y += circle.moving_vector.y * (dt * 600);
+	circle.speed = std::clamp(circle.speed - static_cast<float>(dt) * 200, static_cast<float>(800), static_cast<float>(1600));
+
+	circle._x += circle.moving_vector.x * (dt * circle.speed);
+	circle._y += circle.moving_vector.y * (dt * circle.speed);
 }
 
 void GameState::Update_Rect(Rect& rect1, Rect& rect2, f64 dt)
 {
 	if (AEInputCheckCurr(AEVK_W))
 	{
-		rect1._y = std::clamp(rect1._y + static_cast<float>(dt) * 600, -AEGfxGetWindowHeight() / 2 + rect1._height / 2, AEGfxGetWindowHeight() / 2 - rect1._height / 2);
+		rect1._y = std::clamp(rect1._y + static_cast<float>(dt) * 1000, -AEGfxGetWindowHeight() / 2 + rect1._height / 2, AEGfxGetWindowHeight() / 2 - rect1._height / 2);
 	}
 	if (AEInputCheckCurr(AEVK_S))
 	{
-		rect1._y = std::clamp(rect1._y - static_cast<float>(dt) * 600, -AEGfxGetWindowHeight() / 2 + rect1._height / 2, AEGfxGetWindowHeight() / 2 - rect1._height / 2);
+		rect1._y = std::clamp(rect1._y - static_cast<float>(dt) * 1000, -AEGfxGetWindowHeight() / 2 + rect1._height / 2, AEGfxGetWindowHeight() / 2 - rect1._height / 2);
 	}
 
 	s32 mouse_x = 0;
@@ -214,11 +237,11 @@ void GameState::Update_Rect(Rect& rect1, Rect& rect2, f64 dt)
 	{
 		if (rect2._y < mouse_y)
 		{
-			rect2._y = std::clamp(rect2._y + static_cast<float>(dt) * 600, -AEGfxGetWindowHeight() / 2 + rect2._height / 2, AEGfxGetWindowHeight() / 2 - rect2._height / 2);
+			rect2._y = std::clamp(rect2._y + static_cast<float>(dt) * 1000, -AEGfxGetWindowHeight() / 2 + rect2._height / 2, AEGfxGetWindowHeight() / 2 - rect2._height / 2);
 		}
 		else
 		{
-			rect2._y = std::clamp(rect2._y - static_cast<float>(dt) * 600, -AEGfxGetWindowHeight() / 2 + rect2._height / 2, AEGfxGetWindowHeight() / 2 - rect2._height / 2);
+			rect2._y = std::clamp(rect2._y - static_cast<float>(dt) * 1000, -AEGfxGetWindowHeight() / 2 + rect2._height / 2, AEGfxGetWindowHeight() / 2 - rect2._height / 2);
 		}
 	}
 }
