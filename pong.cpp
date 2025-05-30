@@ -1,4 +1,5 @@
 #include "pong.hpp"
+#include "gamemanager.hpp"
 #include "AEEngine.h"
 #include <string>
 #include <sstream>
@@ -7,7 +8,7 @@
 #include <algorithm>
 #include <cmath>
 
-GameState::GameState()
+Pong::Pong()
 	: transform{ 0 }
 	, current_Game_State(PRE_START)
 	, start_time(0)
@@ -21,16 +22,8 @@ GameState::GameState()
 {
 }
 
-GameState::Shape::Shape(float x, float y, float width, float height, float r, float g, float b, float a) :_x(x), _y(y), _width(width), _height(height), _r(r), _g(g), _b(b), _a(a) {}
 
-GameState::Rect::Rect(float x, float y, float width, float height, float r, float g, float b, float a) : Shape(x, y, width, height, r, g, b, a), score(0) {}
-
-GameState::Circle::Circle(float x, float y, float width, float height, float r, float g, float b, float a) : Shape(x, y, width, height, r, g, b, a), speed(600)
-{
-	AEVec2Zero(&moving_vector);
-}
-
-void GameState::Init_Game()
+void Pong::Init_Game()
 {
 	AEGfxMeshStart();
 
@@ -55,7 +48,7 @@ void GameState::Init_Game()
 	Init_Circle(circle);
 }
 
-void GameState::Update_Game()
+void Pong::Update_Game()
 {
 	f64 dt = AEFrameRateControllerGetFrameTime();
 
@@ -115,24 +108,24 @@ void GameState::Update_Game()
 	Print_Score();
 }
 
-void GameState::Exit_Game()
+void Pong::Exit_Game()
 {
 	AEGfxMeshFree(pMesh);
 	AEGfxTextureUnload(pTex);
 }
 
-void GameState::Start_Game()
+void Pong::Start_Game()
 {
 	current_Game_State = PLAYING;
 	start_time = AEGetTime(nullptr);
 }
 
-GameState::eGameState GameState::Get_Current_Game_State()
+Pong::ePongState Pong::Get_Current_Game_State()
 {
 	return current_Game_State;
 }
 
-void GameState::Init_Circle(Circle& circle)
+void Pong::Init_Circle(Circle& circle)
 {
 	static std::mt19937 gen{ std::random_device{}() };
 	std::uniform_real_distribution<float> dist(-1, 1);
@@ -145,7 +138,7 @@ void GameState::Init_Circle(Circle& circle)
 	AEVec2Normalize(&circle.moving_vector, &circle.moving_vector);
 }
 
-void GameState::Collision_Check_Player(Rect& rect, Circle& circle)
+void Pong::Collision_Check_Player(Rect& rect, Circle& circle)
 {
 	const float radius = circle._width * 0.5f;
 	const float halfW = rect._width * 0.5f;
@@ -172,7 +165,7 @@ void GameState::Collision_Check_Player(Rect& rect, Circle& circle)
 	}
 }
 
-void GameState::Collision_Check_Line(Circle& circle)
+void Pong::Collision_Check_Line(Circle& circle)
 {
 	float halfH = AEGfxGetWindowHeight() / 2.0f;
 	float radius = circle._height / 2.0f;
@@ -190,7 +183,7 @@ void GameState::Collision_Check_Line(Circle& circle)
 	}
 }
 
-void GameState::Collision_Check_PlayerGoal(Rect& rect, Circle& circle, float wall_x)
+void Pong::Collision_Check_PlayerGoal(Rect& rect, Circle& circle, float wall_x)
 {
 	if ((wall_x - circle._x) * (wall_x - circle._x) < (circle._width / 2) * (circle._width / 2))
 	{
@@ -199,7 +192,7 @@ void GameState::Collision_Check_PlayerGoal(Rect& rect, Circle& circle, float wal
 	}
 }
 
-bool  GameState::CheckPlayerWin(Rect& rect1, Rect& rect2)
+bool  Pong::CheckPlayerWin(Rect& rect1, Rect& rect2)
 {
 	if (rect1.score == 11 || rect2.score == 11)
 		return true;
@@ -207,7 +200,7 @@ bool  GameState::CheckPlayerWin(Rect& rect1, Rect& rect2)
 	return false;
 }
 
-void GameState::Update_Circle(Circle& circle, f64 dt)
+void Pong::Update_Circle(Circle& circle, f64 dt)
 {
 	circle.speed = std::clamp(circle.speed - static_cast<float>(dt) * 200, static_cast<float>(800), static_cast<float>(1600));
 
@@ -215,7 +208,7 @@ void GameState::Update_Circle(Circle& circle, f64 dt)
 	circle._y += circle.moving_vector.y * (dt * circle.speed);
 }
 
-void GameState::Update_Rect(Rect& rect1, Rect& rect2, f64 dt)
+void Pong::Update_Rect(Rect& rect1, Rect& rect2, f64 dt)
 {
 	if (AEInputCheckCurr(AEVK_W))
 	{
@@ -246,7 +239,7 @@ void GameState::Update_Rect(Rect& rect1, Rect& rect2, f64 dt)
 	}
 }
 
-void GameState::Print_Time()
+void Pong::Print_Time()
 {
 	static int curr_min = 0;
 	static int curr_sec = 0;
@@ -270,20 +263,20 @@ void GameState::Print_Time()
 	AEGfxPrint(font, time.c_str(), -text_width / 2, 0.8f, 0.5f, 1.f, 1.f, 1.f, 1);
 }
 
-void GameState::Print_Square()
+void Pong::Print_Square()
 {
 	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
 
-	Draw_Shape(p1);
+	Draw_Shape(p1, pMesh, transform);
 
-	Draw_Shape(-AEGfxGetWindowWidth() / 2, 0, 40, AEGfxGetWindowHeight(), 1.f, 0.f, 1.f, 1.f);
+	Draw_Shape(-AEGfxGetWindowWidth() / 2, 0, 40, AEGfxGetWindowHeight(), 1.f, 0.f, 1.f, 1.f, pMesh, transform);
 
-	Draw_Shape(p2);
+	Draw_Shape(p2, pMesh, transform);
 
-	Draw_Shape(AEGfxGetWindowWidth() / 2, 0, 40, AEGfxGetWindowHeight(), 0.f, 1.f, 1.f, 1.f);
+	Draw_Shape(AEGfxGetWindowWidth() / 2, 0, 40, AEGfxGetWindowHeight(), 0.f, 1.f, 1.f, 1.f, pMesh, transform);
 }
 
-void GameState::Print_Circle()
+void Pong::Print_Circle()
 {
 	AEGfxSetRenderMode(AE_GFX_RM_TEXTURE);
 
@@ -293,10 +286,10 @@ void GameState::Print_Circle()
 
 	AEGfxTextureSet(pTex, 0, 0);
 
-	Draw_Shape(circle);
+	Draw_Shape(circle, pMesh, transform);
 }
 
-void GameState::Print_Score()
+void Pong::Print_Score()
 {
 	std::ostringstream oss;
 
@@ -316,7 +309,7 @@ void GameState::Print_Score()
 	AEGfxPrint(font, oss.str().c_str(), 0.25 - text_width / 2, 0.75f, 0.6f, 1.f, 1.f, 1.f, 1);
 }
 
-void GameState::Print_Winner()
+void Pong::Print_Winner()
 {
 	f32 text_width = 0;
 
@@ -333,27 +326,3 @@ void GameState::Print_Winner()
 	}
 }
 
-void GameState::Draw_Shape(float x, float y, float w, float h, float r, float g, float b, float a)
-{
-	Rect shape(x, y, w, h, r, g, b, a);
-
-	Draw_Shape(shape);
-}
-
-void  GameState::Draw_Shape(Shape& shape)
-{
-	AEMtx33 scale;
-	AEMtx33Scale(&scale, shape._width, shape._height);
-	AEMtx33 tran;
-	AEMtx33Trans(&tran, shape._x, shape._y);
-
-	AEMtx33Concat(&transform, &tran, &scale);
-
-	AEGfxSetColorToMultiply(0.f, 0.f, 0.f, 0.f);
-
-	AEGfxSetColorToAdd(shape._r, shape._g, shape._b, shape._a);
-
-	AEGfxSetTransform(transform.m);
-
-	AEGfxMeshDraw(pMesh, AE_GFX_MDM_TRIANGLES);
-}

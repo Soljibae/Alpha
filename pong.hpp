@@ -1,12 +1,13 @@
+#ifndef PONG_HPP
+#define PONG_HPP
+
 #include "AEEngine.h"
-#include <vector>
+#include "utils.hpp"
 
-
-
-class GameState
+class Pong
 {
 public:
-	GameState();
+	Pong();
 
 	typedef enum
 	{
@@ -14,38 +15,14 @@ public:
 		PLAYING,
 		VICTORY,
 		GAME_OVER
-	} eGameState;
-
-	struct Shape
-	{
-		float _x, _y;
-		float _width, _height;
-		float _r, _g, _b, _a;
-
-		Shape(float x, float y, float width, float height, float r = 1.f, float g = 1.f, float b = 1.f, float a = 1.f);
-	};
-
-	struct Rect : public Shape
-	{
-		int score;
-
-		Rect(float x, float y, float width, float height, float r = 1.f, float g = 1.f, float b = 1.f, float a = 1.f);
-	};
-
-	struct Circle : public Shape
-	{
-		AEVec2 moving_vector;
-		float speed;
-
-		Circle(float x, float y, float width, float height, float r = 1.f, float g = 1.f, float b = 1.f, float a = 1.f);
-	};
+	} ePongState;
 
 	void Init_Game();
 	void Update_Game();
 	void Exit_Game();
 
 	void Start_Game();
-	eGameState Get_Current_Game_State();
+	ePongState Get_Current_Game_State();
 
 	void Init_Circle(Circle& circle);
 
@@ -61,11 +38,9 @@ public:
 	void Print_Circle();
 	void Print_Score();
 	void Print_Winner();
-	void Draw_Shape(float x, float y, float w, float h, float r, float g, float b, float a);
-	void Draw_Shape(Shape& shape);
 
 private:
-	eGameState current_Game_State;
+	ePongState current_Game_State;
 	f64 start_time;
 	f64 curr_time;
 	s8 font;
@@ -77,3 +52,4 @@ private:
 	Circle circle;
 };
 
+#endif

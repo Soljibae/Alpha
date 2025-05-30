@@ -19,11 +19,15 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\gamemanager.cpp" />
     <ClCompile Include="..\main.cpp" />
     <ClCompile Include="..\pong.cpp" />
+    <ClCompile Include="..\utils.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\gamemanager.hpp" />
     <ClInclude Include="..\pong.hpp" />
+    <ClInclude Include="..\utils.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
