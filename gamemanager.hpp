@@ -3,6 +3,7 @@
 
 #include "pong.hpp"
 #include "splashscreen.hpp"
+#include "mainmenu.hpp"
 
 typedef enum
 {
@@ -23,6 +24,7 @@ public:
 private:
 	eGameState current_Game_State;
 	SplashScreen Splash_Screen_Manager;
+	MainMenu Main_Menu_Manager;
 	Pong Pong_Manager;
 };
 

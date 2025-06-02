@@ -27,6 +27,8 @@ void SplashScreen::Init_SplashScreen()
 		-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
 
 	pMesh = AEGfxMeshEnd();
+
+	current_Screen_State = START;
 }
 
 void SplashScreen::Update_SplashScreen()

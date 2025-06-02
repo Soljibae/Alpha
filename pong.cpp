@@ -39,6 +39,10 @@ void Pong::Init_Game()
 
 	pMesh = AEGfxMeshEnd();
 
+	pTex = AEGfxTextureLoad("Assets/circle.png");
+
+	current_Game_State = PRE_START;
+
 	p1._y = 0;
 	p2._y = 0;
 

@@ -17,7 +17,7 @@ void Draw_Shape(float x, float y, float w, float h, float r, float g, float b, f
 	Draw_Shape(shape, pMesh, transform);
 }
 
-void  Draw_Shape(Shape& shape, AEGfxVertexList* pMesh, AEMtx33& transform)
+void Draw_Shape(Shape& shape, AEGfxVertexList* pMesh, AEMtx33& transform)
 {
 	AEMtx33 scale;
 	AEMtx33Scale(&scale, shape._width, shape._height);
@@ -33,4 +33,21 @@ void  Draw_Shape(Shape& shape, AEGfxVertexList* pMesh, AEMtx33& transform)
 	AEGfxSetTransform(transform.m);
 
 	AEGfxMeshDraw(pMesh, AE_GFX_MDM_TRIANGLES);
+}
+
+bool Is_Mouse_In_Square(Rect& rect)
+{
+	s32 mouse_x = 0;
+	s32 mouse_y = 0;
+
+	AEInputGetCursorPosition(&mouse_x, &mouse_y);
+
+	mouse_x = static_cast<float>(mouse_x) - AEGfxGetWindowWidth() / 2.0f;
+	mouse_y = AEGfxGetWindowHeight() / 2.0f - static_cast<float>(mouse_y);
+
+	if (rect._x - rect._width / 2.f <= mouse_x && mouse_x <= rect._x + rect._width / 2.f &&
+		rect._y - rect._height / 2.f <= mouse_y && mouse_y <= rect._y + rect._height / 2.f)
+		return true;
+
+	return false;
 }

@@ -30,5 +30,7 @@ struct Circle : public Shape
 void Draw_Shape(float x, float y, float w, float h, float r, float g, float b, float a, AEGfxVertexList* pMesh, AEMtx33& transform);
 
 void Draw_Shape(Shape& shape, AEGfxVertexList* pMesh, AEMtx33& transform);
+
+bool Is_Mouse_In_Square(Rect& rect);
  
 #endif

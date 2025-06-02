@@ -1,3 +1,8 @@
+#ifndef SPLASHSCREEN_HPP
+#define SPLASHSCREEN_HPP
+
+#include "AEEngine.h"
+#include "utils.hpp"
 
 class SplashScreen
 {
@@ -23,3 +28,5 @@ private:
 	Rect title;
 	f64 screen_Time;
 };
+
+#endif
