@@ -22,11 +22,13 @@
     <ClCompile Include="..\gamemanager.cpp" />
     <ClCompile Include="..\main.cpp" />
     <ClCompile Include="..\pong.cpp" />
+    <ClCompile Include="..\splashscreen.cpp" />
     <ClCompile Include="..\utils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\gamemanager.hpp" />
     <ClInclude Include="..\pong.hpp" />
+    <ClInclude Include="..\splashscreen.hpp" />
     <ClInclude Include="..\utils.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

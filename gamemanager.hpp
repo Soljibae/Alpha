@@ -2,6 +2,7 @@
 #define GAMEMANAGER_HPP
 
 #include "pong.hpp"
+#include "splashscreen.hpp"
 
 typedef enum
 {
@@ -21,6 +22,7 @@ public:
 	eGameState Get_Current_Game_State();
 private:
 	eGameState current_Game_State;
+	SplashScreen Splash_Screen_Manager;
 	Pong Pong_Manager;
 };
 
