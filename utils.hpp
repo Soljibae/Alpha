@@ -27,9 +27,9 @@ struct Circle : public Shape
 	Circle(float x, float y, float width, float height, float r = 1.f, float g = 1.f, float b = 1.f, float a = 1.f);
 };
 
-void Draw_Shape(float x, float y, float w, float h, float r, float g, float b, float a, AEGfxVertexList* pMesh, AEMtx33& transform);
+void Draw_Shape(float x, float y, float w, float h, float r, float g, float b, float a, AEGfxVertexList* pMesh, AEMtx33& transform, bool Is_Texture_Mode);
 
-void Draw_Shape(Shape& shape, AEGfxVertexList* pMesh, AEMtx33& transform);
+void Draw_Shape(Shape& shape, AEGfxVertexList* pMesh, AEMtx33& transform, bool Is_Texture_Mode);
 
 bool Is_Mouse_In_Square(Rect& rect);
  

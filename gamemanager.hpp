@@ -4,6 +4,7 @@
 #include "pong.hpp"
 #include "splashscreen.hpp"
 #include "mainmenu.hpp"
+#include "animation.hpp"
 
 typedef enum
 {
@@ -26,6 +27,7 @@ private:
 	SplashScreen Splash_Screen_Manager;
 	MainMenu Main_Menu_Manager;
 	Pong Pong_Manager;
+	Animation Animation_Manager;
 };
 
 #endif

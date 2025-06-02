@@ -19,6 +19,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\animation.cpp" />
+    <ClCompile Include="..\character.cpp" />
     <ClCompile Include="..\gamemanager.cpp" />
     <ClCompile Include="..\main.cpp" />
     <ClCompile Include="..\mainmenu.cpp" />
@@ -27,6 +29,8 @@
     <ClCompile Include="..\utils.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\animation.hpp" />
+    <ClInclude Include="..\character.hpp" />
     <ClInclude Include="..\gamemanager.hpp" />
     <ClInclude Include="..\mainmenu.hpp" />
     <ClInclude Include="..\pong.hpp" />

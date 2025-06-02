@@ -40,7 +40,7 @@ void MainMenu::Update_MainMenu()
 	
 	delay += dt;
 
-	if (delay >= 1.f && AEInputCheckTriggered(AEVK_ESCAPE))
+	if (delay >= 0.3 && AEInputCheckTriggered(AEVK_ESCAPE))
 		current_Menu_State = EXIT;
 
 	AEGfxSetBackgroundColor(0.0f, 0.0f, 0.0f);
@@ -50,11 +50,11 @@ void MainMenu::Update_MainMenu()
 	f32 text_width = 0;
 	f32 text_height = 0;
 
-	Draw_Shape(pong_Button, pMesh, transform);
+	Draw_Shape(pong_Button, pMesh, transform, false);
 	AEGfxGetPrintSize(font, "PONG", 0.5f, &text_width, &text_height);
 	AEGfxPrint(font, "PONG", -text_width / 2, pong_Button._y * 2 / AEGfxGetWindowHeight() - text_height / 2, 0.5f, 1.f, 1.f, 1.f, 1);
 
-	Draw_Shape(animation_Button, pMesh, transform);
+	Draw_Shape(animation_Button, pMesh, transform, false);
 	AEGfxGetPrintSize(font, "ANIMATON", 0.5f, &text_width, &text_height);
 	AEGfxPrint(font, "ANIMATON", -text_width / 2, animation_Button._y * 2 / AEGfxGetWindowHeight() - text_height / 2, 0.5f, 1.f, 1.f, 1.f, 1);
 

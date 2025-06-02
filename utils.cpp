@@ -10,14 +10,14 @@ Circle::Circle(float x, float y, float width, float height, float r, float g, fl
 	AEVec2Zero(&moving_vector);
 }
 
-void Draw_Shape(float x, float y, float w, float h, float r, float g, float b, float a, AEGfxVertexList* pMesh, AEMtx33& transform)
+void Draw_Shape(float x, float y, float w, float h, float r, float g, float b, float a, AEGfxVertexList* pMesh, AEMtx33& transform, bool Is_Texture_Mode)
 {
 	Rect shape(x, y, w, h, r, g, b, a);
 
-	Draw_Shape(shape, pMesh, transform);
+	Draw_Shape(shape, pMesh, transform, Is_Texture_Mode);
 }
 
-void Draw_Shape(Shape& shape, AEGfxVertexList* pMesh, AEMtx33& transform)
+void Draw_Shape(Shape& shape, AEGfxVertexList* pMesh, AEMtx33& transform, bool Is_Texture_Mode)
 {
 	AEMtx33 scale;
 	AEMtx33Scale(&scale, shape._width, shape._height);
@@ -26,10 +26,19 @@ void Draw_Shape(Shape& shape, AEGfxVertexList* pMesh, AEMtx33& transform)
 
 	AEMtx33Concat(&transform, &tran, &scale);
 
-	AEGfxSetColorToMultiply(0.f, 0.f, 0.f, 0.f);
+	if (Is_Texture_Mode)
+	{
+		AEGfxSetColorToMultiply(1.f, 1.f, 1.f, 0.f);
 
-	AEGfxSetColorToAdd(shape._r, shape._g, shape._b, shape._a);
+		AEGfxSetColorToAdd(shape._r, shape._g, shape._b, shape._a);
+	}
+	else
+	{
+		AEGfxSetColorToMultiply(0.f, 0.f, 0.f, 0.f);
 
+		AEGfxSetColorToAdd(shape._r, shape._g, shape._b, shape._a);
+	}
+	
 	AEGfxSetTransform(transform.m);
 
 	AEGfxMeshDraw(pMesh, AE_GFX_MDM_TRIANGLES);

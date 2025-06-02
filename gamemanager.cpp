@@ -75,6 +75,26 @@ void GameState::Running_game()
 				current_Game_State = MAINMENU;
 			}
 		}
+
+		if (current_Game_State == ANIMATION)
+		{
+			Animation_Manager.Init_Animation();
+
+			while (Animation_Manager.Get_Current_Animation_State() != Animation::GAME_OVER)
+			{
+				AESysFrameStart();
+
+				Animation_Manager.Update_Animation();
+
+				AESysFrameEnd();
+			}
+
+			if (Animation_Manager.Get_Current_Animation_State() == Animation::GAME_OVER)
+			{
+				Animation_Manager.Exit_Animation();
+				current_Game_State = MAINMENU;
+			}
+		}
 	}	
 }
 

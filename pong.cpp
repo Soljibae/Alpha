@@ -21,14 +21,14 @@ Pong::Pong()
 	, circle{ 0, 0, 50, 50 }
 {
 }
-
+	
 
 void Pong::Init_Game()
 {
 	AEGfxMeshStart();
 
 	AEGfxTriAdd(
-		-0.5f, -0.5f, 0xFFFFFFFF, 0.0f, 1.0f,
+		-0.5f, -0.5f, 0xFFFFFFFF, 0.0, 1.0f,
 		0.5f, -0.5f, 0xFFFFFFFF, 1.0f, 1.0f,
 		-0.5f, 0.5f, 0xFFFFFFFF, 0.0f, 0.0f);
 
@@ -83,9 +83,9 @@ void Pong::Update_Game()
 
 		Collision_Check_Player(p2, circle);
 
-		Collision_Check_PlayerGoal(p1, circle, AEGfxGetWindowWidth() / 2 - 20);
+		Collision_Check_PlayerGoal(p1, circle, AEGfxGetWindowWidth() / 2.f - 20.f);
 
-		Collision_Check_PlayerGoal(p2, circle, -AEGfxGetWindowWidth() / 2 + 20);
+		Collision_Check_PlayerGoal(p2, circle, -AEGfxGetWindowWidth() / 2.f + 20.f);
 
 		Collision_Check_Line(circle);
 
@@ -165,7 +165,7 @@ void Pong::Collision_Check_Player(Rect& rect, Circle& circle)
 		
 		circle.moving_vector = changed_vector;
 
-		circle.speed = 1600;            
+		circle.speed = 2000;            
 	}
 }
 
@@ -206,10 +206,10 @@ bool  Pong::CheckPlayerWin(Rect& rect1, Rect& rect2)
 
 void Pong::Update_Circle(Circle& circle, f64 dt)
 {
-	circle.speed = std::clamp(circle.speed - static_cast<float>(dt) * 200, static_cast<float>(800), static_cast<float>(1600));
+	circle.speed = std::clamp(circle.speed - static_cast<float>(dt) * 400, static_cast<float>(1200), static_cast<float>(2000));
 
-	circle._x += circle.moving_vector.x * (dt * circle.speed);
-	circle._y += circle.moving_vector.y * (dt * circle.speed);
+	circle._x += circle.moving_vector.x * (static_cast<float>(dt) * circle.speed);
+	circle._y += circle.moving_vector.y * (static_cast<float>(dt) * circle.speed);
 }
 
 void Pong::Update_Rect(Rect& rect1, Rect& rect2, f64 dt)
@@ -271,13 +271,13 @@ void Pong::Print_Square()
 {
 	AEGfxSetRenderMode(AE_GFX_RM_COLOR);
 
-	Draw_Shape(p1, pMesh, transform);
+	Draw_Shape(p1, pMesh, transform, false);
 
-	Draw_Shape(-AEGfxGetWindowWidth() / 2, 0, 40, AEGfxGetWindowHeight(), 1.f, 0.f, 1.f, 1.f, pMesh, transform);
+	Draw_Shape(-AEGfxGetWindowWidth() / 2.f, 0, 40.f, AEGfxGetWindowHeight(), 1.f, 0.f, 1.f, 1.f, pMesh, transform, false);
 
-	Draw_Shape(p2, pMesh, transform);
+	Draw_Shape(p2, pMesh, transform, false);
 
-	Draw_Shape(AEGfxGetWindowWidth() / 2, 0, 40, AEGfxGetWindowHeight(), 0.f, 1.f, 1.f, 1.f, pMesh, transform);
+	Draw_Shape(AEGfxGetWindowWidth() / 2.f, 0, 40.f, AEGfxGetWindowHeight(), 0.f, 1.f, 1.f, 1.f, pMesh, transform, false);
 }
 
 void Pong::Print_Circle()
@@ -290,7 +290,7 @@ void Pong::Print_Circle()
 
 	AEGfxTextureSet(pTex, 0, 0);
 
-	Draw_Shape(circle, pMesh, transform);
+	Draw_Shape(circle, pMesh, transform, true);
 }
 
 void Pong::Print_Score()
