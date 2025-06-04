@@ -13,17 +13,24 @@ public:
 	void Update_Character();
 	void Exit_Character();
 
+	void Print_Character();
+	void Change_Character_State();
+
+	void PlayerWalk(f64 dt);
+	void PlayerDeath(f64 dt);
+
 	typedef enum
 	{
 		IDLE,
 		WALK,
 		JUMP,
-		DEATH
+		DEATH,
+		MAX_CNT
 	} eCharacterState;
 
 private:
 	eCharacterState current_Character_State;
-	AEGfxTexture* pTex;
+	AEGfxTexture* pTex[MAX_CNT];
 	AEGfxVertexList* pMesh;
 	AEMtx33 transform;
 	float _x, _y;
@@ -32,6 +39,7 @@ private:
 	f64 animation_Time;
 	int animaiton_Count;
 	const int animaiton_Total_Count = 8;
+	bool isFacingRight;
 };
 
 #endif
