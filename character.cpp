@@ -10,8 +10,7 @@ Character::Character()
 	, _y(0.f)
 	, _width(384.f / 4.f)
 	, _height(64.f * 2.f)
-	, _u0(0.f)
-	, _u1(1.f / 8.f)
+	, _offset(0.f)
 	, animation_Time(0.f)
 	, animaiton_Count(0)
 {
@@ -27,23 +26,27 @@ Character::~Character()
 
 void Character::Init_Character()
 {
+	if (pMesh)
+		AEGfxMeshFree(pMesh);
+	if (pTex)
+		AEGfxTextureUnload(pTex);
+
 	_x = 0.f;
 	_y = 0.f;
-	_u0 = 0.f;
-	_u1 = 1.f / 8.f;
+	_offset = 0.f;
 	animaiton_Count = 0;
 
 	AEGfxMeshStart();
 
 	AEGfxTriAdd(
-		-0.5f, -0.5f, 0xFFFFFFFF, _u0, 1.0f,
-		0.5f, -0.5f, 0xFFFFFFFF, _u1, 1.0f,
-		-0.5f, 0.5f, 0xFFFFFFFF, _u0, 0.0f);
+		-0.5f, -0.5f, 0xFFFFFFFF, 0.f, 1.0f,
+		0.5f, -0.5f, 0xFFFFFFFF, 1.f / 8.f, 1.0f,
+		-0.5f, 0.5f, 0xFFFFFFFF, 0.f, 0.0f);
 
 	AEGfxTriAdd(
-		0.5f, -0.5f, 0xFFFFFFFF, _u1, 1.0f,
-		0.5f, 0.5f, 0xFFFFFFFF, _u1, 0.0f,
-		-0.5f, 0.5f, 0xFFFFFFFF, _u0, 0.0f);
+		0.5f, -0.5f, 0xFFFFFFFF, 1.f / 8.f, 1.0f,
+		0.5f, 0.5f, 0xFFFFFFFF, 1.f / 8.f, 0.0f,
+		-0.5f, 0.5f, 0xFFFFFFFF, 0.f, 0.0f);
 
 	pMesh = AEGfxMeshEnd();
 
@@ -64,22 +67,7 @@ void Character::Update_Character()
 		animation_Time = 0;
 		animaiton_Count = (animaiton_Count + 1) % animaiton_Total_Count;
 
-		_u0 = static_cast<float>(animaiton_Count) / 8.f;
-		_u1 = static_cast<float>(animaiton_Count + 1) / 8.f;
-
-		AEGfxMeshStart();
-
-		AEGfxTriAdd(
-			-0.5f, -0.5f, 0xFFFFFFFF, _u0, 1.0f,
-			0.5f, -0.5f, 0xFFFFFFFF, _u1, 1.0f,
-			-0.5f, 0.5f, 0xFFFFFFFF, _u0, 0.0f);
-
-		AEGfxTriAdd(
-			0.5f, -0.5f, 0xFFFFFFFF, _u1, 1.0f,
-			0.5f, 0.5f, 0xFFFFFFFF, _u1, 0.0f,
-			-0.5f, 0.5f, 0xFFFFFFFF, _u0, 0.0f);
-
-		pMesh = AEGfxMeshEnd();
+		_offset = animaiton_Count * (1.f / 8.f);
 	}
 
 	AEGfxSetBackgroundColor(0.5, 0.5, 0.5);
@@ -88,7 +76,7 @@ void Character::Update_Character()
 	AEGfxSetBlendMode(AE_GFX_BM_BLEND);
 	AEGfxSetTransparency(1.0f);
 
-	AEGfxTextureSet(pTex, 0, 0);
+	AEGfxTextureSet(pTex, _offset, 0);
 
 	Draw_Shape(_x, _y, _width, _height, 0.f, 0.f, 0.f, 1.f, pMesh, transform, true);
 }

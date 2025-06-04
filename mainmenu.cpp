@@ -22,6 +22,9 @@ MainMenu::~MainMenu()
 
 void MainMenu::Init_MainMenu()
 {
+	if (pMesh)
+		AEGfxMeshFree(pMesh);
+
 	AEGfxMeshStart();
 
 	AEGfxTriAdd(

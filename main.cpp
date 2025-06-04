@@ -13,6 +13,8 @@ int APIENTRY wWinMain(
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
 
+    //_crtBreakAlloc = 392;
+
     AESysInit(hInstance, nCmdShow, 1600, 900, 1, 60, true, NULL);
 
     AESysSetWindowTitle("Pong");

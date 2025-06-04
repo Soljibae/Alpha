@@ -33,6 +33,11 @@ Pong::~Pong()
 
 void Pong::Init_Game()
 {
+	if (pMesh)
+		AEGfxMeshFree(pMesh);
+	if (pTex)
+		AEGfxTextureUnload(pTex);
+
 	AEGfxMeshStart();
 
 	AEGfxTriAdd(
@@ -127,6 +132,7 @@ void Pong::Exit_Game()
 
 	AEGfxTextureUnload(pTex);
 	pTex = nullptr;
+
 }
 
 void Pong::Start_Game()
