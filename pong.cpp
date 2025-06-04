@@ -21,6 +21,14 @@ Pong::Pong()
 	, circle{ 0, 0, 50, 50 }
 {
 }
+
+Pong::~Pong()
+{
+	if(pMesh)
+		AEGfxMeshFree(pMesh);
+	if (pTex)
+		AEGfxTextureUnload(pTex);
+}
 	
 
 void Pong::Init_Game()
@@ -115,7 +123,10 @@ void Pong::Update_Game()
 void Pong::Exit_Game()
 {
 	AEGfxMeshFree(pMesh);
+	pMesh = nullptr;
+
 	AEGfxTextureUnload(pTex);
+	pTex = nullptr;
 }
 
 void Pong::Start_Game()

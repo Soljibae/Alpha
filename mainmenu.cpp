@@ -14,6 +14,12 @@ MainMenu::MainMenu()
 	animation_Button._y = -AEGfxGetWindowHeight() / 4.0f;
 }
 
+MainMenu::~MainMenu()
+{
+	if (pMesh)
+		AEGfxMeshFree(pMesh);
+}
+
 void MainMenu::Init_MainMenu()
 {
 	AEGfxMeshStart();
@@ -70,6 +76,7 @@ void MainMenu::Update_MainMenu()
 void MainMenu::Exit_MainMenu()
 {
 	AEGfxMeshFree(pMesh);
+	pMesh = nullptr;
 }
 
 MainMenu::eMainMenuState MainMenu::Get_Current_Menu_State()

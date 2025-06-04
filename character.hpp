@@ -7,6 +7,7 @@ class Character
 {
 public:
 	Character();
+	~Character();
 
 	void Init_Character();
 	void Update_Character();

@@ -17,6 +17,14 @@ Character::Character()
 {
 }
 
+Character::~Character()
+{
+	if (pMesh)
+		AEGfxMeshFree(pMesh);
+	if (pTex)
+		AEGfxTextureUnload(pTex);
+}
+
 void Character::Init_Character()
 {
 	_x = 0.f;
@@ -88,5 +96,8 @@ void Character::Update_Character()
 void Character::Exit_Character()
 {
 	AEGfxMeshFree(pMesh);
+	pMesh = nullptr;
+
 	AEGfxTextureUnload(pTex);
+	pTex = nullptr;
 }

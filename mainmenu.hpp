@@ -8,6 +8,7 @@ class MainMenu
 {
 public:
 	MainMenu();
+	~MainMenu();
 
 	typedef enum
 	{

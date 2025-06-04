@@ -8,6 +8,7 @@ class Pong
 {
 public:
 	Pong();
+	~Pong();
 
 	typedef enum
 	{
