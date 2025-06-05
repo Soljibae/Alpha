@@ -19,11 +19,23 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\animation.cpp" />
+    <ClCompile Include="..\character.cpp" />
+    <ClCompile Include="..\gamemanager.cpp" />
     <ClCompile Include="..\main.cpp" />
+    <ClCompile Include="..\mainmenu.cpp" />
     <ClCompile Include="..\pong.cpp" />
+    <ClCompile Include="..\splashscreen.cpp" />
+    <ClCompile Include="..\utils.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\animation.hpp" />
+    <ClInclude Include="..\character.hpp" />
+    <ClInclude Include="..\gamemanager.hpp" />
+    <ClInclude Include="..\mainmenu.hpp" />
     <ClInclude Include="..\pong.hpp" />
+    <ClInclude Include="..\splashscreen.hpp" />
+    <ClInclude Include="..\utils.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
@@ -123,6 +135,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

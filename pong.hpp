@@ -1,50 +1,56 @@
+#ifndef PONG_HPP
+#define PONG_HPP
+
 #include "AEEngine.h"
-#include <vector>
+#include "utils.hpp"
 
-typedef enum
-{
-	PRE_START,
-	PLAYING,
-	GAME_OVER
-} eGameState;
-
-struct Shape;
-
-class GameState
+class Pong
 {
 public:
-	GameState();
+	Pong();
+	~Pong();
+
+	typedef enum
+	{
+		PRE_START,
+		PLAYING,
+		VICTORY,
+		GAME_OVER
+	} ePongState;
 
 	void Init_Game();
 	void Update_Game();
 	void Exit_Game();
 
-	void StartGame();
+	void Start_Game();
+	ePongState Get_Current_Game_State();
 
-	eGameState GetcurrentGameState();
+	void Init_Circle(Circle& circle);
 
-	void PrintTime();
-	void PrintSquare();
-	void PrintCircle();
-	void DrawShape(float x, float y, float w, float h, float r, float g, float b, float a);
-	void DrawShape(Shape& shape);
+	void Collision_Check_Player(Rect& rect, Circle& circle);
+	void Collision_Check_Line(Circle& circle);
+	void Collision_Check_PlayerGoal(Rect& rect, Circle& circle, float wall_x);
+	bool CheckPlayerWin(Rect& rect1, Rect& rect2);
+	void Update_Circle(Circle& circle, f64 dt);
+	void Update_Rect(Rect& rect1, Rect& rect2, f64 dt);
+
+	void Print_Time();
+	void Print_Square();
+	void Print_Circle();
+	void Print_Score();
+	void Print_Winner();
 
 private:
-	eGameState currentGameState;
+	ePongState current_Game_State;
 	f64 start_time;
 	f64 curr_time;
 	s8 font;
 	AEGfxVertexList* pMesh;
 	AEMtx33 transform;
 	AEGfxTexture* pTex;
+	Rect p1;
+	Rect p2;
+	Circle circle;
 };
 
-struct Shape
-{
-public:
-	float _x, _y;
-	float _width, _height;
-	float _r, _g, _b, _a;
-
-	Shape(float x, float y, float width, float height, float r, float g, float b, float a);
-};
+#endif

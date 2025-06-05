@@ -1,6 +1,6 @@
 #include <crtdbg.h> // To check for memory leaks
 #include "AEEngine.h"
-#include "pong.hpp"
+#include "gamemanager.hpp"
 
 int APIENTRY wWinMain(
     _In_ HINSTANCE hInstance,
@@ -13,24 +13,15 @@ int APIENTRY wWinMain(
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
 
+    //_crtBreakAlloc = 392;
+
     AESysInit(hInstance, nCmdShow, 1600, 900, 1, 60, true, NULL);
 
     AESysSetWindowTitle("Pong");
     
     GameState gameState;
 
-    gameState.Init_Game();
-
-    while (gameState.GetcurrentGameState() != GAME_OVER)
-    {
-        AESysFrameStart();
-
-        gameState.Update_Game();
-
-        AESysFrameEnd();
-    }
-
-    gameState.Exit_Game();
+    gameState.Running_game();
 
     AESysExit();
 
