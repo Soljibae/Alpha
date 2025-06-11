@@ -28,9 +28,9 @@ void Draw_Shape(Shape& shape, AEGfxVertexList* pMesh, AEMtx33& transform, bool I
 
 	if (Is_Texture_Mode)
 	{
-		AEGfxSetColorToMultiply(1.f, 1.f, 1.f, 0.f);
+		AEGfxSetColorToMultiply(1.f, 1.f, 1.f, 1.f);
 
-		AEGfxSetColorToAdd(shape._r, shape._g, shape._b, shape._a);
+		AEGfxSetColorToAdd(0.f, 0.f, 0.f, 0.f);
 	}
 	else
 	{
